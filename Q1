@@ -1,0 +1,69 @@
+#include <iostream>
+
+// Custom exceptions
+class InsufficientFundsException : public std::exception {
+public:
+    const char* what() const noexcept override {
+        return "Insufficient funds for this withdrawal.";
+    }
+};
+
+class InvalidAmountException : public std::exception {
+public:
+    const char* what() const noexcept override {
+        return "Invalid withdrawal amount. Amount cannot be negative.";
+    }
+};
+
+// BankAccount class
+class BankAccount {
+private:
+    double balance;
+
+public:
+    BankAccount(double initialBalance) {
+        balance = initialBalance;
+    }
+
+    double getBalance() const {
+        return balance;
+    }
+
+    void withdraw(double amount) {
+        if (amount <= 0) {
+            throw InvalidAmountException();
+        }
+
+        if (amount > balance) {
+            throw InsufficientFundsException();
+        }
+
+        balance -= amount;
+    }
+};
+
+int main() {
+    double initialBalance, withdrawalAmount;
+
+    // Get initial balance from the user
+    std::cout << "Enter the initial balance: ";
+    std::cin >> initialBalance;
+
+    // Create a BankAccount object
+    BankAccount account(initialBalance);
+
+    // Get withdrawal amount from the user
+    std::cout << "Enter the withdrawal amount: ";
+    std::cin >> withdrawalAmount;
+
+    try {
+        account.withdraw(withdrawalAmount);
+        std::cout << "Withdrawal successful. Your new balance is: " << account.getBalance() << std::endl;
+    } catch (const InsufficientFundsException& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    } catch (const InvalidAmountException& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
